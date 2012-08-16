@@ -94,19 +94,10 @@ namespace {
     std::transform(alGal.begin(), alGal.end(), normu.begin(), (double (*)(double)) &std::sqrt);
 
     double coeff = -epsp/(2*rho); // always negative
-    // double Ma = coeff*t*(1+rho); // Never used
-    // double Mb = coeff*t*(1+rho);
 
-    // double ph = (Ma + Mb)/2; // always Ma; never used, always gets factored out by normalize
-    // double nu = (Ma - Mb)/2; // always 0
     std::vector<double> ps(m,0.0);
-    // std::vector<double> comega(m,0.0);
-    // std::vector<double> somega(m,0.0);
 
     for( int i = 0; i < m; ++i ) {
-      // ps[i] = std::sqrt(nu*nu + coeff*coeff*alGal[i]); // always |coeff|*normu[i]
-      // comega[i] = nu/ps[i]; // always 0
-      // somega[i] = coeff*normu[i]/ps[i]; // always -1
       ps[i] = std::abs(coeff)*normu[i];
     }
 
@@ -116,25 +107,17 @@ namespace {
     if (quash > cutoff) {
       for( int i = 0; i < m; ++i ) {
         double epsquash = std::exp(ps[i] - quash)/2;
-        // X.x11[i] = epsquash*(1 + comega[i]);
-        // X.x12[i] = epsquash*somega[i];
-        // X.x22[i] = epsquash*(1 - comega[i]);
         X.x11[i] = X.x22[i] = epsquash;
         X.x12[i] = -epsquash;
       }
-      // X.ea = std::exp(nu-quash);
       X.ea = std::exp(-quash); // probably insignificant
     }
     else {
       // Factoring out exp(ph), as it gets factored out by the normalize anyway
       for( int i = 0; i < m; ++i ) {
-        // X.x11[i] = (std::cosh(ps[i]) + std::sinh(ps[i])*comega[i]);
-        // X.x12[i] = (std::sinh(ps[i])*somega[i]);
-        // X.x22[i] = (std::cosh(ps[i]) - std::sinh(ps[i])*comega[i]);
         X.x11[i] = X.x22[i] = std::cosh(ps[i]);
         X.x12[i] = -std::sinh(ps[i]);
       }
-      // X.ea = exp(nu);
       X.ea = 1;
     }
 
